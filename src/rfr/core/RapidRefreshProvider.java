@@ -12,8 +12,9 @@ import org.eclipse.core.resources.refresh.RefreshProvider;
 
 public class RapidRefreshProvider extends RefreshProvider {
 
+	// add project names here to monitor them
 	private static final String[] PROJECTS_NAMES = {
-		"gc-analytics-web"
+		"YOUR_PROJECT_NAME"
 	};
 	
 	private Set<String> projects = new HashSet<>();

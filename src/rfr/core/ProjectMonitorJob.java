@@ -14,6 +14,8 @@ import org.eclipse.core.runtime.jobs.Job;
 public class ProjectMonitorJob extends Job {
 
 	private static final String JOB_NAME = "ProjectMonitorJob";
+	
+	// add folders here to monitor them (folder that exist within the projects you are monitoring)
 	private static final String[] FOLDERS = {
 			"src/main/webapp/resources"
 	};

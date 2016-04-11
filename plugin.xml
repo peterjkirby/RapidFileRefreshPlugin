@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="RapidFileRefresher"
+         point="org.eclipse.core.resources.refreshProviders">
+      <refreshProvider
+            class="rfr.core.RapidRefreshProvider"
+            name="RapidFileRefresher">
+      </refreshProvider>   </extension>
+
+</plugin>

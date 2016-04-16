@@ -7,7 +7,7 @@ public class Activator extends Plugin {
 
 	private static Activator INSTANCE;
 
-	public static final String PLUGIN_ID = "RapidFileRefresher";
+	public static final String PLUGIN_ID = Settings.PLUGIN_ID;
 
 	public Activator() {
 		super();
@@ -21,11 +21,12 @@ public class Activator extends Plugin {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
+		
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		super.stop(context);
+		RefreshMonitorManager.getInstance().destroyAll();
 	}
 
 }

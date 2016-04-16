@@ -20,43 +20,44 @@ public class ProjectMonitorJob extends Job {
 	private static final String[] FOLDERS = {
 			"src/main/webapp/resources"
 	};
-	// fires about 3 times per second.
-	private static final int DELAY = 350;
-	private boolean RUNNING = true;
 
 	private IResource resource;
 	private IRefreshResult result;
+	private int refreshInterval;
 
-	public ProjectMonitorJob(IResource resource, IRefreshResult result) {
+	public ProjectMonitorJob(IResource resource, IRefreshResult result, int refreshInterval) {
 		super(Activator.PLUGIN_ID + " - " + JOB_NAME);
 		this.resource = resource;
 		this.result = result;
+		this.refreshInterval = refreshInterval;
 
 	}
 
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
+		if (monitor.isCanceled()) return Status.CANCEL_STATUS;
+		
+		IProject project = (IProject) resource;
 
-		if (RUNNING) {
-
-			IProject project = (IProject) resource;
-
-			for (String folderPath : FOLDERS) {
-				monitor(project, folderPath);
-			}
-
-			// schedule the next run
-			schedule(DELAY);
+		for (String folderPath : FOLDERS) {
+			if (monitor.isCanceled()) return Status.CANCEL_STATUS;
+			monitor(project, folderPath, monitor);
 		}
 
-		return Status.OK_STATUS;
+		if (monitor.isCanceled()) {
+			return Status.CANCEL_STATUS;
+		} else {
+			// schedule the next run
+			schedule(refreshInterval);
+			return Status.OK_STATUS;
+		}	
 	}
 
-	private void monitor(IProject project, String folderPath) {
+	private void monitor(IProject project, String folderPath, IProgressMonitor monitor) {
 		IFolder folder = project.getFolder(new Path(folderPath));
 
 		if (folder.exists()) {
-			ResourceTraverser traverser = new ResourceTraverser(new ResourceChangeEvaluator());
+			ResourceTraverser traverser = new ResourceTraverser(new ResourceChangeEvaluator(), monitor);
 
 			try {
 				traverser.traverse(folder, result);
@@ -65,8 +66,14 @@ public class ProjectMonitorJob extends Job {
 		}
 	}
 
-	public void stop() {
-		RUNNING = false;
+	public int getRefreshInterval() {
+		return refreshInterval;
 	}
+
+	public void setRefreshInterval(int refreshInterval) {
+		this.refreshInterval = refreshInterval;
+	}
+	
+	
 
 }

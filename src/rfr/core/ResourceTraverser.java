@@ -5,27 +5,34 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.refresh.IRefreshResult;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
 public class ResourceTraverser {
 
 	private ResourceChangeEvaluator resourceChangeEvaluator;
+	private IProgressMonitor monitor;
 
-	public ResourceTraverser(ResourceChangeEvaluator resourceChangeEvaluator) {
+	public ResourceTraverser(ResourceChangeEvaluator resourceChangeEvaluator, IProgressMonitor monitor) {
 		this.resourceChangeEvaluator = resourceChangeEvaluator;
+		this.monitor = monitor;
 	}
 
-	public void traverse(IFolder folder, IRefreshResult refreshResult) throws CoreException {
-
+	public IStatus traverse(IFolder folder, IRefreshResult refreshResult) throws CoreException {
+		if (monitor.isCanceled()) return Status.CANCEL_STATUS;
+		
 		IResource[] contents = folder.members();
 		Activator activator = Activator.getInstance();
 
 		if (resourceChangeEvaluator.changed(folder)) {
 			refreshResult.refresh(folder);
+			return Status.OK_STATUS;
 		}
 
 		for (IResource resource : contents) {
+			if (monitor.isCanceled()) return Status.CANCEL_STATUS;
+			
 			if (resource.getType() == IResource.FILE) {
 				IFile file = (IFile) resource;
 
@@ -54,10 +61,12 @@ public class ResourceTraverser {
 									Activator.PLUGIN_ID,
 									"Folder change detected. Refreshing " + subfolder.getName()));
 				} else {
-					traverse((IFolder) resource, refreshResult);
+					return traverse((IFolder) resource, refreshResult);
 				}
 			}
 		}
+		
+		return Status.OK_STATUS;
 	}
 
 }

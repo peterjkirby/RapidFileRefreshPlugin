@@ -9,36 +9,46 @@ import org.eclipse.core.runtime.IStatus;
 public class RapidRefreshProvider extends RefreshProvider {
 	
 	private MonitorEvaluator evaluator = new MonitorEvaluator();
-	
+		
+	@Override
+	protected IRefreshMonitor createPollingMonitor(IResource resource) {
+		Logger.log(IStatus.INFO, "-------SOMEBODY REQUESTED A POLLING MONITOR BE CREATED! " + resource.getName());
+		return null;
+	}
+
 	@Override
 	public IRefreshMonitor installMonitor(IResource resource, IRefreshResult result) {
 		if (!evaluator.canMonitor(resource)) return null;
 							
 		Integer refreshInterval = PropertyExtractor.getInteger(Settings.REFRESH_INTERVAL_PROP, resource);
 				
-		RapidRefreshMonitor monitor = RefreshMonitorManager
+		RapidRefreshMonitor monitor = MonitorManager
 				.getInstance()
-				.create(resource, result, refreshInterval);
+				.create(resource, new RefreshManager(result), refreshInterval);
 		
-		if (refreshInterval != null) {
-			Logger.log(IStatus.INFO, "Starting monitor for resource: " + resource.getName());
+		if (refreshInterval != null && refreshInterval != 0) {
 			monitor.start();			
 		}
+		
 		return monitor;
 	}
 
 	@Override
 	public void resetMonitors(IResource resource) {
 		if (!evaluator.canMonitor(resource)) return;
+						
+		if (evaluator.shouldMonitor(resource)) {
+			Integer refreshInterval = PropertyExtractor.getInteger(Settings.REFRESH_INTERVAL_PROP, resource);
+			MonitorManager
+				.getInstance()
+				.restart(resource, refreshInterval);	
+		} else {
+			MonitorManager
+				.getInstance()
+				.stop(resource);
+		}
 		
-		RapidRefreshMonitor monitor = RefreshMonitorManager.getInstance().getMonitor(resource);
-		
-		if (monitor == null) return;
-		
-		if (monitor.isStarted()) {
-			monitor.stop();
-			monitor.start();	
-		}		
+			
 	}
 	
 	

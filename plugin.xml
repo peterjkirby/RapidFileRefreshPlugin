@@ -17,33 +17,6 @@
             id="rfr.core.properties.rfrPropertiesPage">
       </page>
    </extension>
-
-   <extension
-         point="org.eclipse.ui.views">
-      <category
-            name="RapidRefreshPlugin"
-            id="RapidFileRefresh">
-      </category>
-      <view
-            name="Project Manager"
-            icon="icons/sample.gif"
-            category="RapidFileRefresh"
-            class="rfr.core.views.ProjectListView"
-            id="rfr.core.views.ProjectListView">
-      </view>
-   </extension>
-   <extension
-         point="org.eclipse.ui.perspectiveExtensions">
-      <perspectiveExtension
-            targetID="org.eclipse.jdt.ui.JavaPerspective">
-         <view
-               ratio="0.5"
-               relative="org.eclipse.ui.views.ProblemView"
-               relationship="right"
-               id="rfr.core.views.SampleView">
-         </view>
-      </perspectiveExtension>
-   </extension>
    <extension
          point="org.eclipse.help.contexts">
       <contexts

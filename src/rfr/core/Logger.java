@@ -8,11 +8,16 @@ public class Logger {
 	public static void log(int status, String message) {
 		Activator activator = Activator.getInstance();
 		if (activator == null) return;
-		
+						
 		ILog log = activator.getLog();
 		if (log == null) return;
 		
-		log.log(new Status(status, Settings.PLUGIN_ID, message));
+		// using try catch b/c as eclipse shuts down, logging sometimes fails. 
+		// the bug is an Eclipse problem.
+		try {
+			log.log(new Status(status, Settings.PLUGIN_ID, message));
+		} catch (Exception e) {};
+		
 	}
 	
 }

@@ -11,7 +11,8 @@ public class ResourceChangeEvaluator {
 		
 	public boolean changed(IFolder folder) {
 		if (folder == null) return false;
-		return !folder.isSynchronized(IResource.DEPTH_ONE);
+		if (!folder.exists()) return false;
+		return !folder.isSynchronized(IResource.DEPTH_ZERO);
 	}
 	
 	public boolean changed(IFile file) throws CoreException {

@@ -3,7 +3,6 @@ package rfr.core;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.refresh.IRefreshResult;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -14,7 +13,6 @@ import org.eclipse.core.runtime.jobs.Job;
 public class ProjectMonitorJob extends Job {
 
 	private static final String JOB_NAME = "ProjectMonitorJob";
-
 	// add folders here to monitor them (folder that exist within the projects
 	// you are monitoring)
 	private static final String[] FOLDERS = {
@@ -22,19 +20,28 @@ public class ProjectMonitorJob extends Job {
 	};
 
 	private IResource resource;
-	private IRefreshResult result;
+	private RefreshManager refreshManager;
+	
 	private int refreshInterval;
 
-	public ProjectMonitorJob(IResource resource, IRefreshResult result, int refreshInterval) {
-		super(Activator.PLUGIN_ID + " - " + JOB_NAME);
+	public ProjectMonitorJob(IResource resource, RefreshManager refreshManager, int refreshInterval) {
+		super(Settings.PLUGIN_ID + " - " + JOB_NAME);
+		setSystem(true);
+		setPriority(Job.DECORATE);
 		this.resource = resource;
-		this.result = result;
+		this.refreshManager = refreshManager;
 		this.refreshInterval = refreshInterval;
 
+	}
+	
+	@Override
+	protected void canceling() {
+		Logger.log(IStatus.CANCEL, "Job monitoring resource (" + resource.getName() + ") was cancelled.");
 	}
 
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
+		Logger.log(IStatus.INFO, "Job monitoring resource (" + resource.getName() + ") running.");
 		if (monitor.isCanceled()) return Status.CANCEL_STATUS;
 		
 		IProject project = (IProject) resource;
@@ -52,6 +59,8 @@ public class ProjectMonitorJob extends Job {
 			return Status.OK_STATUS;
 		}	
 	}
+	
+	
 
 	private void monitor(IProject project, String folderPath, IProgressMonitor monitor) {
 		IFolder folder = project.getFolder(new Path(folderPath));
@@ -60,7 +69,7 @@ public class ProjectMonitorJob extends Job {
 			ResourceTraverser traverser = new ResourceTraverser(new ResourceChangeEvaluator(), monitor);
 
 			try {
-				traverser.traverse(folder, result);
+				traverser.traverse(folder, refreshManager);
 			} catch (CoreException e) {
 			}
 		}

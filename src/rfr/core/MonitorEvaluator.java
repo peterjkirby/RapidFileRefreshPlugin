@@ -20,6 +20,14 @@ public class MonitorEvaluator {
 		return true;
 	}
 	
+	/**
+	 * Returns true if we can monitor the resource and 
+	 * the RapidResourceRefresh properties for the resource meet
+	 * the conditions necessary for polling to occur.
+	 * 
+	 * @param resource
+	 * @return
+	 */
 	public boolean shouldMonitor(IResource resource) {
 		if (resource == null) return false;
 		if (resource.getType() != IResource.PROJECT) return false;

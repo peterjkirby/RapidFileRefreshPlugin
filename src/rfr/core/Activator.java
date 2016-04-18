@@ -7,8 +7,6 @@ public class Activator extends Plugin {
 
 	private static Activator INSTANCE;
 
-	public static final String PLUGIN_ID = Settings.PLUGIN_ID;
-
 	public Activator() {
 		super();
 		INSTANCE = this;
@@ -26,7 +24,7 @@ public class Activator extends Plugin {
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
-		RefreshMonitorManager.getInstance().destroyAll();
+		MonitorManager.getInstance().destroyAll();
 	}
 
 }

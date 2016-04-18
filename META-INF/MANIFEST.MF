@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: RapidFileRefresher
 Bundle-SymbolicName: rfr.RapidFileRefresher;singleton:=true
-Bundle-Version: 1.0.3
+Bundle-Version: 1.1.0
 Bundle-Activator: rfr.core.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui;bundle-version="3.107.0",
@@ -19,4 +19,4 @@ Import-Package: org.eclipse.core.internal.refresh,
  org.eclipse.jdt.core
 Bundle-Vendor: PeterKirby
 Export-Package: rfr.core,
- rfr.core.views
+ rfr.core.properties

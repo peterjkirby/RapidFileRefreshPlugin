@@ -3,7 +3,6 @@ package rfr.core;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.refresh.IRefreshResult;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -19,14 +18,13 @@ public class ResourceTraverser {
 		this.monitor = monitor;
 	}
 
-	public IStatus traverse(IFolder folder, IRefreshResult refreshResult) throws CoreException {
+	public IStatus traverse(IFolder folder, RefreshManager refreshManager) throws CoreException {
 		if (monitor.isCanceled()) return Status.CANCEL_STATUS;
 		
 		IResource[] contents = folder.members();
-		Activator activator = Activator.getInstance();
-
+		
 		if (resourceChangeEvaluator.changed(folder)) {
-			refreshResult.refresh(folder);
+			refreshManager.refresh(folder);
 			return Status.OK_STATUS;
 		}
 
@@ -37,11 +35,8 @@ public class ResourceTraverser {
 				IFile file = (IFile) resource;
 
 				if (resourceChangeEvaluator.changed(file)) {
-					refreshResult.refresh(file);
-					activator.getLog().log(
-							new Status(IStatus.INFO,
-									Activator.PLUGIN_ID,
-									"File change detected. Refreshing " + file.getName()));
+					refreshManager.refresh(file);
+					Logger.log(IStatus.INFO, "File change detected. Refreshing " + file.getName());
 				}
 
 			} else if (resource.getType() == IResource.FOLDER) {
@@ -55,13 +50,10 @@ public class ResourceTraverser {
 				// next pass.
 				// This is more a performance optimization than anything else.
 				if (resourceChangeEvaluator.changed(subfolder)) {
-					refreshResult.refresh(subfolder);
-					activator.getLog().log(
-							new Status(IStatus.INFO,
-									Activator.PLUGIN_ID,
-									"Folder change detected. Refreshing " + subfolder.getName()));
+					refreshManager.refresh(subfolder);
+					Logger.log(IStatus.INFO, "Folder change detected. Refreshing " + subfolder.getName());
 				} else {
-					return traverse((IFolder) resource, refreshResult);
+					return traverse((IFolder) resource, refreshManager);
 				}
 			}
 		}

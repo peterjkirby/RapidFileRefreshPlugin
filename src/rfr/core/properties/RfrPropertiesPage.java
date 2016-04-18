@@ -1,7 +1,6 @@
 package rfr.core.properties;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.jdt.core.IJavaProject;
@@ -16,14 +15,13 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.PropertyPage;
 
 import rfr.core.MonitorEvaluator;
+import rfr.core.MonitorManager;
 import rfr.core.PropertyExtractor;
-import rfr.core.RefreshMonitorManager;
 import rfr.core.Settings;
 
 public class RfrPropertiesPage extends PropertyPage {
 
-	private static final String PATH_TITLE = "Path:";
-	private static final String OWNER_TITLE = "&Owner:";
+	private static final String OWNER_TITLE = "Resource polling interval (0 = disabled)";
 	
 	
 	private static final int TEXT_FIELD_WIDTH = 50;
@@ -44,29 +42,6 @@ public class RfrPropertiesPage extends PropertyPage {
 		return project;
 	}
 	
-	
-	
-	private void addFirstSection(Composite parent) {
-		Composite composite = createDefaultComposite(parent);
-		IProject project = getProject();
-		
-		//Label for path field
-		Label pathLabel = new Label(composite, SWT.NONE);
-		pathLabel.setText(PATH_TITLE);
-
-		// Path text field
-		Text pathValueText = new Text(composite, SWT.WRAP | SWT.READ_ONLY);
-		pathValueText.setText(project.getFullPath().toString());
-	}
-
-	private void addSeparator(Composite parent) {
-		Label separator = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
-		GridData gridData = new GridData();
-		gridData.horizontalAlignment = GridData.FILL;
-		gridData.grabExcessHorizontalSpace = true;
-		separator.setLayoutData(gridData);
-	}
-
 	private void addSecondSection(Composite parent) {
 		Composite composite = createDefaultComposite(parent);
 
@@ -102,8 +77,6 @@ public class RfrPropertiesPage extends PropertyPage {
 		data.grabExcessHorizontalSpace = true;
 		composite.setLayoutData(data);
 
-		addFirstSection(composite);
-		addSeparator(composite);
 		addSecondSection(composite);
 		return composite;
 	}
@@ -136,10 +109,10 @@ public class RfrPropertiesPage extends PropertyPage {
 				ownerText.getText());
 				
 			if (evaluator.shouldMonitor(getProject())) {
-				RefreshMonitorManager.getInstance()
+				MonitorManager.getInstance()
 					.restart(getProject(), PropertyExtractor.getInteger(Settings.REFRESH_INTERVAL_PROP, getProject()));	
 			} else {
-				RefreshMonitorManager.getInstance()
+				MonitorManager.getInstance()
 					.stop(getProject());
 			}
 			

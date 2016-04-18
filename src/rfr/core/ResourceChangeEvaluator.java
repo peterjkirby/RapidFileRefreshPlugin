@@ -12,7 +12,7 @@ public class ResourceChangeEvaluator {
 	public boolean changed(IFolder folder) {
 		if (folder == null) return false;
 		if (!folder.exists()) return false;
-		if (folder.isSynchronized(IResource.DEPTH_ZERO)) return false;
+		if (folder.isSynchronized(IResource.DEPTH_ONE)) return false;
 		
 		return true;		
 	}

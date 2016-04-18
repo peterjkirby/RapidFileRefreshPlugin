@@ -53,7 +53,8 @@ public class ResourceTraverser {
 					refreshManager.refresh(subfolder);
 					Logger.log(IStatus.INFO, "Folder change detected. Refreshing " + subfolder.getName());
 				} else {
-					return traverse((IFolder) resource, refreshManager);
+					IStatus status = traverse((IFolder) resource, refreshManager);
+					if (status == Status.CANCEL_STATUS) return status;
 				}
 			}
 		}

@@ -41,7 +41,6 @@ public class ProjectMonitorJob extends Job {
 
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
-		Logger.log(IStatus.INFO, "Job monitoring resource (" + resource.getName() + ") running.");
 		if (monitor.isCanceled()) return Status.CANCEL_STATUS;
 		
 		IProject project = (IProject) resource;
